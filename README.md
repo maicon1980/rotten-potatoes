@@ -1,13 +1,7 @@
-# rotten-potatoes
+# Desafio Docker-07.2/07 - rotten-potatoes
 
-## Configuração
+O App Rotten-Potatoes está rodando porta 5000
 
-MONGODB_DB => Nome do database
+O Banco MongoDB na porta 27017
 
-MONGODB_HOST => Host do MongoDB
-
-MONGODB_PORT => Posta de acesso ao MongoDB
-
-MONGODB_USERNAME => Usuário do MongoDB
-
-MONGODB_PASSWORD => Senha do MongoDB
+O Mongo-Express na porta roda na porta 8081
