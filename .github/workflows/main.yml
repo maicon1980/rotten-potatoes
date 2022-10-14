@@ -85,7 +85,7 @@ jobs:
         with:
           images: maiconnf1980/rotten-potatoes:${{github.run_number}}
           manifests:
-            k8s/dp-rotten-potatoes.yaml
+            k8s/deployment-stgclass.yml
 Footer
 © 2022 GitHub, Inc.
 Footer navigation
