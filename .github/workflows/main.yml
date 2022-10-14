@@ -33,8 +33,8 @@ jobs:
       - name: Construindo Imagem e enviando para o Docker Hub
         uses: docker/build-push-action@v3.1.0
         with: 
-          file: ./src/Dockerfile
-          context: ./src
+          file: ./app/Dockerfile
+          context: ./app
           push: true
           tags: |
             maiconnf1980/rotten-potatoes:latest
