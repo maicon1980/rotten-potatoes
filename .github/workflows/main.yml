@@ -1,0 +1,105 @@
+
+Skip to content
+Pull requests
+Issues
+Marketplace
+Explore
+@maicon1980
+maicon1980 /
+rotten-potatoes
+Public
+forked from KubeDev/rotten-potatoes
+
+Code
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+
+    Settings
+
+rotten-potatoes/.github/workflows/main.yml
+@maicon1980
+maicon1980 Update main.yml
+Latest commit f89d61c on 4 Aug
+History
+1 contributor
+59 lines (50 sloc) 1.75 KB
+# This is a basic workflow to help you get started with Actions
+
+name: CI-CD
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  CI:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Autenticando o usuário no Docker Hub
+        uses: docker/login-action@v2.0.0
+        with:          
+          username: ${{secrets.DOCKERHUB_USER}}
+          password: ${{secrets.DOCKERHUB_PWD}}
+      
+      - name: Construindo Imagem e enviando para o Docker Hub
+        uses: docker/build-push-action@v3.1.0
+        with: 
+          file: ./src/Dockerfile
+          context: ./src
+          push: true
+          tags: |
+            maiconnf1980/rotten-potatoes:latest
+            maiconnf1980/rotten-potatoes:${{github.run_number}}
+  
+  CD:
+    runs-on: ubuntu-latest
+    needs: [CI]
+    steps:      
+      - uses: actions/checkout@v3      
+      - name: Definindo o Kube config
+        uses: Azure/k8s-set-context@v2
+        with: 
+          method: kubeconfig
+          kubeconfig: ${{secrets.K8S_CONFIG}}
+      
+      - name: Efetuando o Deploy no ambiente de testes
+        uses: Azure/k8s-deploy@v3.1
+        with:
+          images: maiconnf1980/rotten-potatoes:${{github.run_number}}
+          manifests:
+            k8s/dp-rotten-potatoes.yaml
+Footer
+© 2022 GitHub, Inc.
+Footer navigation
+
+    Terms
+    Privacy
+    Security
+    Status
+    Docs
+    Contact GitHub
+    Pricing
+    API
+    Training
+    Blog
+    About
+
+rotten-potatoes/main.yml at main · maicon1980/rotten-potatoes
