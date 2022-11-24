@@ -3,19 +3,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongodb
+  name: rotten-db
 spec:
   selector:
     matchLabels:
-      app: mongodb
+      app: rotten-db
   template:
     metadata:
       labels:
-        app: mongodb
+        app: rotten-db
     spec:
       containers:
-      - name: mongodb
+      - name: rotten-db
         image: mongo:5
+        volumeMounts:
+            - mountPath: /data/db
+              name: mongo-data
         ports:
         - containerPort: 27017
         env:
@@ -23,6 +26,10 @@ spec:
           value: mongouser
         - name: MONGO_INITDB_ROOT_PASSWORD
           value: mongopwd
+      volumes:
+        - name: mongo-data
+          hostPath:
+            path: /volumes/mongodb
 
 ---
 
@@ -30,10 +37,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongodb
+  name: rotten-db
 spec:
   selector:
-    app: mongodb
+    app: rotten-db
   ports:
   - port: 27017
   type: ClusterIP
@@ -45,25 +52,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app
+  name: roten-app
 spec:
-  replicas: 7
+  replicas: 1
   selector:
     matchLabels:
-      app: app
+      app: roten-app
   template:
     metadata:
       labels:
-        app: app
+        app: roten-app
     spec:
       containers:
-      - name: app
-        image: maiconnf1980/rotten-potatoes:latest
+      - name: roten-app
+        image: maiconnf1980/rotten-potatoes
         env:
         - name: MONGODB_DB
           value: admin
         - name: MONGODB_HOST
-          value: mongodb
+          value: rotten-db
         - name: MONGODB_PORT
           value: "27017"
         - name: MONGODB_USERNAME
@@ -76,13 +83,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: app
+  name: roten-app
 spec:
   selector:
-    app: app
+    app: roten-app
   ports:
   - port: 80
     targetPort: 5000
-  type: LoadBalancer
-
-
+    nodePort: 30084
+  type: NodePort
